@@ -136,8 +136,7 @@ int4 = movimentaBarra(int4, [b_grande/2,0,11.cm])
 int5 = montaBarra(interior_3)
 
 #Coloca no lugar
-t = Geom::Transformation.new [-11.cm/2,0,h-interior_3]
-ents.transform_entities t, int5
+int5 = movimentaBarra(int5, [-11.cm/2,0,h-interior_3])
 
 #Cria uma barra interior horizontal e faz  uma copia
 int6 = montaBarra(interior_4)
