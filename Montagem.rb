@@ -1,3 +1,26 @@
+def montaBarra(tamanho)
+    ents = Sketchup.active_model.entities
+    barra = ents.add_face [0, 0, 0], [11.cm, 0, 0], [11.cm, 5.cm, 0], [0, 5.cm, 0]
+    barra.reverse!
+    barra.pushpull tamanho
+    barra = ents.add_group barra.all_connected
+    return barra	
+end
+
+def giraBarra(barra, centro, eixo, angulo)
+    ents =  Sketchup.active_model.entities
+    tr = Geom::Transformation.new centro, eixo, angulo
+    ents.transform_entities tr, barra 
+    return barra
+end
+
+def movimentaBarra(barra , destino)
+    ents =  Sketchup.active_model.entities
+    t = Geom::Transformation.new destino
+    ents.transform_entities t, barra 
+    return barra
+end
+
 #Inicia as variavéis com os tamanhos parametrizados
 
 ents = Sketchup.active_model.entities
@@ -15,55 +38,33 @@ interior_4 = (4.25 / 22.5) * tl
 interior_5 = (3.9  / 22.5) * tl
 h = (10.5 / 22.5) * tl
 
-
 #________________________________PARTE INFERIOR_____________________
 
 #Cria a barra grande
-#seção 11x5
-sec = ents.add_face [0,0,0],
-[11.cm,0,0],
-[11.cm,5.cm,0], 
-[0,5.cm,0]
-
-sec.reverse!
-sec.pushpull b_grande
-
-b_b_g = ents.add_group sec.all_connected
+b_b_g = montaBarra(b_grande)
 
 #coloca no lugar
-tr = Geom::Transformation.new [0,0,0], [0,1,0], 90.degrees
-t  = Geom::Transformation.new [(-b_grande/2),0,11.cm]
-ents.transform_entities t*tr, b_b_g
+b_b_g = giraBarra(b_b_g, [0,0,0], [0,1,0], 90.degrees)
+b_b_g = movimentaBarra(b_b_g, [(-b_grande/2),0,11.cm])
 
 #cria um barra pequena
-#seção 11x5
-sec = ents.add_face [0,0,0],
-[11.cm,0,0],
-[11.cm,5.cm,0], 
-[0,5.cm,0]
+b_b_p = montaBarra(b_pequeno)
 
-sec.reverse!
-sec.pushpull b_pequeno
-b_b_p = ents.add_group sec.all_connected
 #coloca no lugar
-tr = Geom::Transformation.new [0,0,0], [0,1,0], -90.degrees
-t  = Geom::Transformation.new [(-b_grande/2-11.cm),0,0]
-ents.transform_entities t*tr, b_b_p
+b_b_p = giraBarra(b_b_p, [0,0,0], [0,1,0], -90.degrees)
+b_b_p = movimentaBarra(b_b_p, [(-b_grande/2-11.cm),0,0])
 
 #faz copia da barra pequena e coloca no lugar
 group2 = b_b_p.copy
-t  = Geom::Transformation.new [(-b_pequeno-11.cm),0,0]
-ents.transform_entities t, group2
+group2 = movimentaBarra(group2, [(-b_pequeno-11.cm),0,0])
 
 #faz copia da barra pequena e coloca no lugar
 group3 = b_b_p.copy
-t  = Geom::Transformation.new [(b_grande+b_pequeno+22.cm),0,0]
-ents.transform_entities t, group3
+group3 = movimentaBarra(group3, [(b_grande+b_pequeno+22.cm),0,0])
 
 #faz copia da barra pequena e coloca no lugar
 group4 = b_b_p.copy
-t  = Geom::Transformation.new [(b_grande+b_pequeno+b_pequeno+33.cm),0,0]
-ents.transform_entities t, group4
+group4 = movimentaBarra(group4, [(b_grande+b_pequeno+b_pequeno+33.cm),0,0])
 
 #_______________________DIAGONAIS____________________________________
 
@@ -72,56 +73,28 @@ tamtot = b_grande + 4 * b_pequeno + 44.cm #tamanho total
 f = b_grande / 2 + b_pequeno + b_pequeno + 22.cm #metade do tamanho total
 
 #Cria primeira parte da diagonal esquerda
-#seção 11x5
-sec = ents.add_face [0,0,0],
-[11.cm,0,0],
-[11.cm,5.cm,0], 
-[0,5.cm,0]
-sec.reverse!
-sec.pushpull diagonal_1
-d1 = ents.add_group sec.all_connected
-#coloca no lugar
-t = Geom::Transformation.new [-f,0,11.cm]
-ents.transform_entities t, d1
+d1 = montaBarra(diagonal_1)
 
-#seção 11x5
+#coloca no lugar
+d1 = movimentaBarra(d1, [-f,0,11.cm])
+
 #Cria segunda parte da diagonal esquerda
-sec = ents.add_face [0,0,0],
-[11.cm,0,0],
-[11.cm,5.cm,0], 
-[0,5.cm,0]
-sec.reverse!
-sec.pushpull diagonal_2
-d2 = ents.add_group sec.all_connected
-#coloca no lugar
-t = Geom::Transformation.new [-f,0,diagonal_1+11.cm+11.cm]
-ents.transform_entities t, d2
+d2 = montaBarra(diagonal_2)
 
-#Cria 3º parte da diagonal esquerda
-#seção 11x5
-sec = ents.add_face [0,0,0],
-[11.cm,0,0],
-[11.cm,5.cm,0], 
-[0,5.cm,0]
-sec.reverse!
-sec.pushpull diagonal_3
-d3 = ents.add_group sec.all_connected
 #coloca no lugar
-t = Geom::Transformation.new [-f,0,diagonal_1+diagonal_2+11.cm+2*11.cm]
-ents.transform_entities t, d3
+d2 = movimentaBarra(d2, [-f,0,diagonal_1+11.cm+11.cm])
+
+#Cria terceira parte da diagonal esquerda
+d3 = montaBarra(diagonal_3) 
+
+#coloca no lugar
+d3 = movimentaBarra(d3, [-f,0,diagonal_1+diagonal_2+11.cm+2*11.cm])
 
 #Cria 4º parte da diagonal esquerda
-#seção 11x5
-sec = ents.add_face [0,0,0],
-[11.cm,0,0],
-[11.cm,5.cm,0], 
-[0,5.cm,0]
-sec.reverse!
-sec.pushpull diagonal_4
-d4 = ents.add_group sec.all_connected
+d4 = montaBarra(diagonal_4) 
+
 #coloca no lugar
-t = Geom::Transformation.new [-f,0,diagonal_1+diagonal_2+diagonal_3+11.cm+3*11.cm]
-ents.transform_entities t, d4
+d4 = movimentaBarra(d4, [-f,0,diagonal_1+diagonal_2+diagonal_3+11.cm+3*11.cm])
 
 #cria grupo Diagonal Esquerda
 model = Sketchup.active_model
@@ -132,102 +105,60 @@ ladoE = entities.add_group(d1,d2,d3,d4)
 ladoD = ladoE.copy
 
 #Rotaciona a Diagonal Esquerda
-tr = Geom::Transformation.new [-f+11.cm,0,11.cm], [0,1,0], 47.1.degrees
-ents.transform_entities tr, ladoE
+ladoE = giraBarra(ladoE, [-f+11.cm,0,11.cm], [0,1,0], 47.1.degrees)
 
 #Move a copia da Diagonal Esquerda para a Direita e Rotaciona
-t = Geom::Transformation.new [(tamtot-11.cm),0,0]
-tr = Geom::Transformation.new [f-11.cm,0,11.cm], [0,1,0], -47.1.degrees
-ents.transform_entities t, ladoD
-ents.transform_entities tr, ladoD
+ladoD = movimentaBarra(ladoD, [(tamtot-11.cm),0,0])
+ladoD = giraBarra(ladoD, [f-11.cm,0,11.cm], [0,1,0], -47.1.degrees)
 
 #______________________INTERIOR_____________________________________
 #Cria uma barra interior pequena e faz uma copia
-#seção 11x5
-sec = ents.add_face [0,0,0],
-[11.cm,0,0],
-[11.cm,5.cm,0], 
-[0,5.cm,0]
-
-sec.reverse!
-sec.pushpull interior_1
-int1 = ents.add_group sec.all_connected
+int1 =  montaBarra(interior_1)
 int2 = int1.copy
+
 #Coloca a primeira no lugar
-t = Geom::Transformation.new [-b_grande/2-22.cm-b_pequeno,0,11.cm]
-ents.transform_entities t, int1
+int1 = movimentaBarra(int1, [-b_grande/2-22.cm-b_pequeno,0,11.cm])
+
 #coloca a segunda no lugar
-t = Geom::Transformation.new [b_grande/2+11.cm+b_pequeno,0,11.cm]
-ents.transform_entities t, int2
+int2 = movimentaBarra(int2, [b_grande/2+11.cm+b_pequeno,0,11.cm])
 
 #Cria um barra interior grande e faz uma copia
-#seção 11x5
-sec = ents.add_face [0,0,0],
-[11.cm,0,0],
-[11.cm,5.cm,0], 
-[0,5.cm,0]
-
-sec.reverse!
-sec.pushpull interior_2
-int3 = ents.add_group sec.all_connected
+int3 = montaBarra(interior_2)
 int4 = int3.copy
+
 #Coloca a primeira no lugar
-t = Geom::Transformation.new [-b_grande/2-11.cm,0,11.cm]
-ents.transform_entities t, int3
+int3 = movimentaBarra(int3, [-b_grande/2-11.cm,0,11.cm])
+
 #Coloca a segunda no lugar
-t = Geom::Transformation.new [b_grande/2,0,11.cm]
-ents.transform_entities t, int4
+int4 = movimentaBarra(int4, [b_grande/2,0,11.cm])
 
 #Cria a barra interior do alto
-#seção 11x5
-sec = ents.add_face [0,0,0],
-[11.cm,0,0],
-[11.cm,5.cm,0], 
-[0,5.cm,0]
+int5 = montaBarra(interior_3)
 
-sec.reverse!
-sec.pushpull interior_3
-int5 = ents.add_group sec.all_connected
 #Coloca no lugar
 t = Geom::Transformation.new [-11.cm/2,0,h-interior_3]
 ents.transform_entities t, int5
 
 #Cria uma barra interior horizontal e faz  uma copia
-#seção 11x5
-sec = ents.add_face [0,0,0],
-[11.cm,0,0],
-[11.cm,5.cm,0], 
-[0,5.cm,0]
-
-sec.reverse!
-sec.pushpull interior_4
-int6 = ents.add_group sec.all_connected
+int6 = montaBarra(interior_4)
 int7 = int6.copy
+
 #Coloca a primeira no lugar
-t = Geom::Transformation.new [-11.cm/2,0,h-interior_3-11.cm]
-tr = Geom::Transformation.new [0,0,0], [0,1,0], -90.degrees 
-ents.transform_entities t*tr, int6
+int6 = giraBarra(int6, [0,0,0], [0,1,0], -90.degrees)
+int6 = movimentaBarra(int6, [-11.cm/2,0,h-interior_3-11.cm])
+
 #Coloca a segunda no lugar
-t = Geom::Transformation.new [11.cm/2,0,h-interior_3]
-tr = Geom::Transformation.new [0,0,0], [0,1,0], 90.degrees
-ents.transform_entities t*tr, int7
+int7 = giraBarra(int7, [0,0,0], [0,1,0], 90.degrees)
+int7 = movimentaBarra(int7, [11.cm/2,0,h-interior_3])
 
 #Cria uma barra interior diagonal e faz  uma copia
-#seção 11x5
-sec = ents.add_face [0,0,0],
-[11.cm,0,0],
-[11.cm,5.cm,0], 
-[0,5.cm,0]
-
-sec.reverse!
-sec.pushpull interior_5
-int8 = ents.add_group sec.all_connected
+int8 = montaBarra(interior_5)
 int9 = int8.copy
+
 #coloca a primeira no lugar
-t = Geom::Transformation.new [-b_grande/2-11.cm,0,11.cm]
-tr = Geom::Transformation.new [0,0,0], [0,1,0], -51.1.degrees 
-ents.transform_entities t*tr, int8
+int8 = giraBarra(int8, [0,0,0], [0,1,0], -51.1.degrees )
+int8 = movimentaBarra(int8, [-b_grande/2-11.cm,0,11.cm])
+
 #coloca a segunda no lugar
-t = Geom::Transformation.new [b_grande/2,0,11.cm]
-tr = Geom::Transformation.new [11.cm,0,0], [0,1,0], 51.1.degrees
-ents.transform_entities t*tr, int9
+int9 = giraBarra(int9, [11.cm,0,0], [0,1,0], 51.1.degrees)
+int9 = movimentaBarra(int9, [b_grande/2,0,11.cm])
