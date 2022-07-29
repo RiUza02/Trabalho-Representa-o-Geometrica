@@ -1,4 +1,7 @@
-def montaBarra(tamanho)
+toolbar = UI::Toolbar.new "Treliça"
+# This toolbar icon simply displays Hello World on the screen
+cmd = UI::Command.new("Test") {
+  def montaBarra(tamanho)
     ents = Sketchup.active_model.entities
     barra = ents.add_face [0, 0, 0], [11.cm, 0, 0], [11.cm, 5.cm, 0], [0, 5.cm, 0]
     barra.reverse!
@@ -23,8 +26,29 @@ end
 
 #Inicia as variavéis com os tamanhos parametrizados
 
+#_____________________Interação com Ususário____________________________
+
+prompts = ["Comprimento da Treliça"]
+defaults = [11.25.m,]
+input = UI.inputbox prompts, defaults, "Insira os parâmetros da Treliça:"
+
+tl, = input
+
+while( tl < 6.m || tl > 11.25.m)
+
+UI.messagebox "Fora dos Limites"
+
+
+prompts = ["Comprimento da Treliça"]
+defaults = [11.25.m,]
+input = UI.inputbox prompts, defaults, "Insira os parâmetros da Treliaça:"
+tl, = input
+
+end
+
+#_______________________________________________________________________
+
 ents = Sketchup.active_model.entities
-tl          = 11.25.m
 b_grande   = (10   / 22.5) * tl
 b_pequeno  = (3    / 22.5) * tl
 diagonal_1 = (3.6  / 22.5) * tl
@@ -32,7 +56,7 @@ diagonal_2 = (4.2  / 22.5) * tl
 diagonal_3 = (1    / 22.5) * tl
 diagonal_4 = (5.8  / 22.5) * tl
 interior_1 = (2.5  / 22.5) * tl
-interior_2 = (5    / 22.5) * tl
+interior_2 = (5.5    / 22.5) * tl
 interior_3 = (4    / 22.5) * tl
 interior_4 = (4.25 / 22.5) * tl
 interior_5 = (3.9  / 22.5) * tl
@@ -161,3 +185,14 @@ int8 = movimentaBarra(int8, [-b_grande/2-11.cm,0,11.cm])
 #coloca a segunda no lugar
 int9 = giraBarra(int9, [11.cm,0,0], [0,1,0], 51.1.degrees)
 int9 = movimentaBarra(int9, [b_grande/2,0,11.cm])
+
+treliça_final = entities.add_group b_b_g , b_b_p , group2 , group3 , group4,
+ladoD , ladoE , int1 , int2 , int3 , int4 , int5 , int6 , int7 , int8 ,  int9
+}
+#cmd.small_icon = "ToolPencilSmall.png"
+#cmd.large_icon = "ToolPencilLarge.png"
+cmd.tooltip = "Treliça"
+cmd.status_bar_text = "Monta uma Treliça do tipo Room-in-Attic"
+cmd.menu_text = "Treliça"
+toolbar = toolbar.add_item cmd
+toolbar.show
