@@ -46,21 +46,32 @@ tl, = input
 
 end
 
+# With four params, it shows a drop down box for prompts that have
+# pipe-delimited lists of options. In this case, the Gender prompt
+# is a drop down instead of a text box.
+prompts = ["Madeira"]
+defaults = ["Cambará",]
+list = ["Cambará|Garapeira"]
+input = UI.inputbox(prompts, defaults, list, "Tell me about yourself.")
+tipoMadeira, = input
+
+
 #_______________________________________________________________________
 
 ents = Sketchup.active_model.entities
-b_grande   = (10   / 22.5) * tl
-b_pequeno  = (3    / 22.5) * tl
-diagonal_1 = (3.6  / 22.5) * tl
-diagonal_2 = (4.2  / 22.5) * tl
-diagonal_3 = (1    / 22.5) * tl
-diagonal_4 = (5.8  / 22.5) * tl
-interior_1 = (2.5  / 22.5) * tl
-interior_2 = (5.5    / 22.5) * tl
-interior_3 = (4    / 22.5) * tl
-interior_4 = (4.25 / 22.5) * tl
-interior_5 = (3.9  / 22.5) * tl
+b_grande   = (10   / 22.5) * tl #1
+b_pequeno  = (3    / 22.5) * tl #4
+diagonal_1 = (3.6  / 22.5) * tl #2
+diagonal_2 = (4.2  / 22.5) * tl #2
+diagonal_3 = (1    / 22.5) * tl #2
+diagonal_4 = (5.8  / 22.5) * tl #2
+interior_1 = (2.5  / 22.5) * tl #2
+interior_2 = (5.5  / 22.5) * tl #2
+interior_3 = (4    / 22.5) * tl #1
+interior_4 = (4.25 / 22.5) * tl #2
+interior_5 = (3.9  / 22.5) * tl #2
 h = (10.5 / 22.5) * tl
+
 
 #________________________________PARTE INFERIOR_____________________
 
@@ -188,9 +199,54 @@ int9 = movimentaBarra(int9, [b_grande/2,0,11.cm])
 
 treliça_final = entities.add_group b_b_g , b_b_p , group2 , group3 , group4,
 ladoD , ladoE , int1 , int2 , int3 , int4 , int5 , int6 , int7 , int8 ,  int9
+
+
+totalMadeira = b_grande + 4 * b_pequeno + 2 * (diagonal_1 + diagonal_2 + diagonal_3 + diagonal_4) + 2 * (interior_1 + interior_2 + interior_4 + interior_5) + interior_3
+
+
+case tipoMadeira
+
+when "Cambará"
+precoPorMetro = 23.40
+
+when "Garapeira"
+precoPorMetro = 39.55
+
+end
+
+precoNos = 0
+
+precoTotal = totalMadeira.to_m * precoPorMetro
+
+file = File.new "MARGO.txt", "a"
+
+Dir.chdir "C:/Users/victo/Desktop"
+file.puts
+file.puts "____________________ORÇAMENTO TRELIÇA ROOM-IN-ATTIC____________________"
+file.print "Comprimento: "
+file.puts tl
+file.print "Altura: "
+file.puts h.to_m.round(2)
+file.puts
+file.print "Tipo da Madeira: "
+file.puts tipoMadeira
+file.print "Quantidade de Madeira: "
+file.print totalMadeira.to_m.round(2)
+file.puts " Metros"
+file.puts
+file.print "Preço Total: R$ "
+file.print precoTotal.round(2)
+file.puts
+file.puts
+
+
+file.close
+
+
 }
-#cmd.small_icon = "ToolPencilSmall.png"
-#cmd.large_icon = "ToolPencilLarge.png"
+
+cmd.small_icon = "ToolPencilSmall.png"
+cmd.large_icon = "ToolPencilLarge.png"
 cmd.tooltip = "Treliça"
 cmd.status_bar_text = "Monta uma Treliça do tipo Room-in-Attic"
 cmd.menu_text = "Treliça"
